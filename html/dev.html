@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="../js/mui.min.js"></script>
+    <script src="../js/jquery.js"></script>
+    <link href="../css/mui.min.css" rel="stylesheet"/>
+    <style>
+ 		
+    	.mui-bar-footer .mui-row{
+    		height: 100%;
+    	}
+    	
+    	.mui-bar-footer .mui-col-xs-4{
+    		height: 100%;
+    		display: flex;
+    		justify-content: center;
+    		align-items: center;
+    	}
+
+    </style>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav">
+	    <h1 class="mui-title">设备列表</h1>
+	</header>
+	<div class="mui-content">
+	    <div class="dev-list">
+	    	<ul class="mui-table-view">
+	    	</ul>
+	    </div>
+	</div>	
+	
+	<footer class="mui-bar mui-bar-footer">
+		<div class="mui-row">
+			<div class="mui-col-xs-4">监听</div>
+			<div class="mui-col-xs-4">分析</div>
+			<div class="mui-col-xs-4">我的</div>
+		</div>
+	</footer>
+</body>
+	<script type="text/javascript" >
+		   // H5 plus事件处理
+function plusReady(){
+	
+
+    // 5+ API code
+    var BluetoothAdapter = plus.android.importClass("android.bluetooth.BluetoothAdapter");
+    var BAdapter = new BluetoothAdapter.getDefaultAdapter();
+    if (!BAdapter.isEnabled()) {
+        BAdapter.enable(); //启动蓝牙
+    }
+     
+  	function bluetooth_list(){
+			var main = plus.android.runtimeMainActivity();
+			var Context = plus.android.importClass("android.content.Context");
+			var lists = BAdapter.getBondedDevices();
+			plus.android.importClass(lists);
+	
+			var iterator = lists.iterator();
+			plus.android.importClass(iterator);
+   			var devList = [];
+   			
+			while (iterator.hasNext()) {
+				var d = iterator.next();
+				plus.android.importClass(d);
+				var e = document.createElement('li');
+				
+				$(e).attr('_key',devList.length);
+				
+				
+				$(e).text(d.getName()).addClass("mui-table-view-cell");
+				$(e).click(function(){
+					var key = $(this).attr('_key');
+					connectDev(devList[key]);
+				})
+				devList.push(d);
+				$('.mui-table-view').append(e);
+			}  
+		}	
+		
+      	bluetooth_list();
+	} 
+	 
+	//监听“plusready”事件
+	document.addEventListener("plusready",plusReady,false);
+	
+	var mask = mui.createMask();//callback为用户点击蒙版时自动执行的回调；
+	
+	let  connectDev =  (device)=>{
+		var main = plus.android.runtimeMainActivity();
+		var BluetoothAdapter = plus.android.importClass('android.bluetooth.BluetoothAdapter');
+		var UUID = plus.android.importClass('java.util.UUID');
+		var uuid = UUID.fromString("38400000-8cf0-11bd-b23e-10b96e4ef00d");
+		var BAdapter = BluetoothAdapter.getDefaultAdapter();
+		var bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(uuid);
+		plus.android.importClass(bluetoothSocket);
+		if(!bluetoothSocket.isConnected()) {
+			mask.show();//显示遮罩
+			var w = plus.nativeUI.showWaiting( "连接-"+device.getName() );
+			setTimeout(()=>{
+				try{
+					var ret = bluetoothSocket.connect();
+				}catch(e){
+					mui.alert("无法连接到:"+device.getName(),"提示");
+				}
+				
+				w.close();
+				mask.close();//关闭遮罩
+				if(bluetoothSocket.isConnected()) { 
+					isOpen=true;
+				}
+			},1000);
+		} 
+	}
+	</script>
+</html>

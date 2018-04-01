@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="js/mui.min.js"></script>
+    <script src="js/jquery.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <style>
+ 		
+    	.mui-bar-footer .mui-row{
+    		height: 100%;
+    	}
+    	
+    	.mui-bar-footer .mui-col-xs-4{
+    		height: 100%;
+    		display: flex;
+    		justify-content: center;
+    		align-items: center;
+    	}
+    	
+    	.mui-pull-left{
+    		height: 100%;
+    		display: flex;
+    		justify-content: center;
+    		align-items: center;
+    	}
+
+    </style>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-pull-left">设备</a>
+	    <h1 class="mui-title">数据监听</h1>
+	</header>
+	<div class="mui-content">
+	    <div class="dev-list">
+	    	<ul class="mui-table-view">
+	    	</ul>
+	    </div>
+	</div>	
+	
+	<footer class="mui-bar mui-bar-footer">
+		<div class="mui-row">
+			<div class="mui-col-xs-4">监听</div>
+			<div class="mui-col-xs-4">分析</div>
+			<div class="mui-col-xs-4">我的</div>
+		</div>
+	</footer>
+</body>
+<script type="text/javascript" >
+		   // H5 plus事件处理
+
+	$(document).ready(()=>{
+		$('.mui-pull-left').click(()=>{
+			mui.openWindow('./html/dev.html');
+		})
+	})
+
+  	let plusReady =()=>{}
+  
+	 
+	//监听“plusready”事件
+	document.addEventListener("plusready",plusReady,false);
+	
+	var mask = mui.createMask();//callback为用户点击蒙版时自动执行的回调；
+
+	</script>
+</html>
