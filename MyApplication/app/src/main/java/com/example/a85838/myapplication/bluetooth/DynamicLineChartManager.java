@@ -1,8 +1,9 @@
 package com.example.a85838.myapplication.bluetooth;
 
 import android.graphics.Color;
-import android.util.Log;
+import android.widget.Button;
 
+import com.example.a85838.myapplication.R;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -34,17 +35,22 @@ public class DynamicLineChartManager {
     private static final  float FONT_SIZE = 2f;
     private boolean pause = false;
 
-
-    public void  pause(){
-        pause = true;
+    public void change(){
+        this.pause = !this.pause;
     }
 
-    public void goon(){
-        pause = false;
+    public boolean  getPause(){
+        return pause;
     }
+
+
     //一条曲线
     public DynamicLineChartManager(LineChart mLineChart, String name, int color) {
         this.lineChart = mLineChart;
+        Description description = new Description();
+        description.setText("波形");
+        description.setTextColor(Color.WHITE);
+        mLineChart.setDescription(description);
         leftAxis = lineChart.getAxisLeft();
         leftAxis.setTextSize(FONT_SIZE);
         leftAxis.setTextColor(Color.WHITE);
@@ -63,7 +69,14 @@ public class DynamicLineChartManager {
         this.lineChart = mLineChart;
         leftAxis = lineChart.getAxisLeft();
         rightAxis = lineChart.getAxisRight();
+        leftAxis.setTextSize(FONT_SIZE);
+        leftAxis.setTextColor(Color.WHITE);
+        rightAxis = lineChart.getAxisRight();
+        rightAxis.setTextSize(FONT_SIZE);
+        rightAxis.setTextColor(Color.WHITE);
         xAxis = lineChart.getXAxis();
+        xAxis.setTextSize(FONT_SIZE);
+        xAxis.setTextColor(Color.WHITE);
         initLineChart();
         initLineDataSet(names, colors);
     }
@@ -93,15 +106,16 @@ public class DynamicLineChartManager {
         //X轴设置显示位置在底部
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
-        xAxis.setLabelCount(10);
+        xAxis.setDrawGridLines(false);
+        xAxis.setDrawLabels(false);
 
-        xAxis.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return timeList.get((int) value % timeList.size());
-            }
-
-        });
+//        xAxis.setValueFormatter(new IAxisValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value, AxisBase axis) {
+//                return timeList.get((int) value % timeList.size());
+//            }
+//
+//        });
 
         //保证Y轴从0开始，不然会上移一点
         leftAxis.setAxisMinimum(0f);
@@ -146,8 +160,8 @@ public class DynamicLineChartManager {
         for (int i = 0; i < names.size(); i++) {
             lineDataSet = new LineDataSet(null, names.get(i));
             lineDataSet.setColor(colors.get(i));
-            lineDataSet.setLineWidth(1.5f);
-            lineDataSet.setCircleRadius(1.5f);
+            lineDataSet.setLineWidth(0.5f);
+            lineDataSet.setCircleRadius(0.5f);
             lineDataSet.setColor(colors.get(i));
 
             lineDataSet.setDrawFilled(true);
@@ -171,7 +185,6 @@ public class DynamicLineChartManager {
      * @param number
      */
     public void addEntry(int number) {
-
         if(pause){
             return;
         }
@@ -194,7 +207,7 @@ public class DynamicLineChartManager {
         lineData.notifyDataChanged();
         lineChart.notifyDataSetChanged();
         //设置在曲线图中显示的最大数量
-        lineChart.setVisibleXRangeMaximum(10);
+        lineChart.setVisibleXRangeMaximum(30);
 
         //移到某个位置
         lineChart.moveViewToX(lineData.getEntryCount() - 5);
@@ -220,7 +233,7 @@ public class DynamicLineChartManager {
             lineData.addEntry(entry, i);
             lineData.notifyDataChanged();
             lineChart.notifyDataSetChanged();
-            lineChart.setVisibleXRangeMaximum(6);
+            lineChart.setVisibleXRangeMaximum(30);
             lineChart.moveViewToX(lineData.getEntryCount() - 5);
         }
     }

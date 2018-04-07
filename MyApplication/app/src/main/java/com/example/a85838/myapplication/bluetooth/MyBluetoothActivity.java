@@ -49,8 +49,13 @@ public class MyBluetoothActivity extends AppCompatActivity {
         lisetView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(MyBluetoothActivity.this, "Click item" + i, Toast.LENGTH_SHORT).show();
+                BluetoothDevice device = mBlueList.get(i);
                 BlueToothUtils.connect(mBlueList.get(i));
+                MyAdapter adapter = new MyAdapter(MyBluetoothActivity.this, mBlueList);
+                lisetView.setAdapter(adapter);
+
+                Toast.makeText(MyBluetoothActivity.this, device.getName(), Toast.LENGTH_LONG).show();
+
             }
         });
         Log.e(TAG, "onCreate: GPS是否可用：" + isGpsEnable(this));
@@ -72,7 +77,6 @@ public class MyBluetoothActivity extends AppCompatActivity {
                 break;
             default:
                 Log.e(TAG, "不支持的操作"+v.getId());
-                break;
         }
     }
 
