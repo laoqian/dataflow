@@ -15,8 +15,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -24,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.example.a85838.myapplication.MainActivity;
 import com.example.a85838.myapplication.R;
 
 import java.lang.reflect.Field;
@@ -39,11 +42,18 @@ public class MyBluetoothActivity extends AppCompatActivity {
 
     private List<BluetoothDevice> mBlueList = new ArrayList<>();
     private ListView lisetView;
-
+    private static  boolean enable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mybluetooth);
+
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
 
         lisetView           =  findViewById(R.id.list_view);
         lisetView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -59,6 +69,19 @@ public class MyBluetoothActivity extends AppCompatActivity {
             }
         });
         Log.e(TAG, "onCreate: GPS是否可用：" + isGpsEnable(this));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent();
+                intent.setClass(MyBluetoothActivity.this, MainActivity.class);
+                startActivity(intent);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void clickHandler(View v) {
@@ -125,7 +148,6 @@ public class MyBluetoothActivity extends AppCompatActivity {
      * 判断蓝牙是否开启
      */
     private void init() {
-
         requestPermission();
         // 判断手机是否支持蓝牙
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -151,6 +173,10 @@ public class MyBluetoothActivity extends AppCompatActivity {
      * 注册异步搜索蓝牙设备的广播
      */
     private void startDiscovery() {
+        if(enable){
+            unregisterReceiver(receiver);
+        }
+
         // 找到设备的广播
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         // 注册广播
@@ -159,7 +185,9 @@ public class MyBluetoothActivity extends AppCompatActivity {
         IntentFilter filter1 = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         // 注册广播
         registerReceiver(receiver, filter1);
+
         Log.e(TAG, "startDiscovery: 注册广播");
+        enable = true;
         startScanBluth();
     }
 
@@ -227,11 +255,6 @@ public class MyBluetoothActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (receiver != null) {
-            //取消注册,防止内存泄露（onDestroy被回调代不代表Activity被回收？：具体回收看系统，由GC回收，同时广播会注册到系统
-            //管理的ams中，即使activity被回收，reciver也不会被回收，所以一定要取消注册），
-            unregisterReceiver(receiver);
-        }
     }
 
     /**

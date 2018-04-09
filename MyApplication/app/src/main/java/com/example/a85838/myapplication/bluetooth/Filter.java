@@ -2,8 +2,6 @@ package com.example.a85838.myapplication.bluetooth;
 
 
 public class Filter{
-
-
     /**
      *
      *A、名称：中位值平均滤波法（又称防脉冲干扰平均滤波法）
@@ -23,9 +21,9 @@ public class Filter{
      *    比较浪费RAM。
      *E、整理：shenhaiyu 2013-11-01
     */
-    private static void sort(byte[] filter_buf, int length) {
+    private static void sort(float[] filter_buf, int length) {
         int i, j;
-        byte filter_temp;
+        float filter_temp;
 
         // 采样值从小到大排列（冒泡法）
         for (j = 0; j < length - 1; j++) {
@@ -39,18 +37,16 @@ public class Filter{
         }
     }
 
-    public static int doAvg(byte[] filter_buf, int length) {
-        int i,filter_sum = 0;
-        for (i = 0; i < length; i++) filter_sum += filter_buf[i];
-        return filter_sum / (length - 2);
-    }
 
-    public static int doFilter(byte[] filter_buf, int length) {
-        int i;
-        int filter_sum = 0;
+    public static float[] doFilter(float[] filter_buf, int length) {
+        int i,j=0;
+        float[] buffer = new float[length-2];
 
         sort(filter_buf,length);
-        for (i = 1; i < length - 1; i++) filter_sum += filter_buf[i];
-        return filter_sum / (length - 2);
+        for (i = 1; i < length - 1; i++) {
+            buffer[j++] = filter_buf[i];
+        }
+
+        return buffer;
     }
 }

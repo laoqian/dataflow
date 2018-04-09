@@ -90,7 +90,7 @@ public class DynamicLineChartManager {
 
         //显示边界
         lineChart.setDrawBorders(true);
-        lineChart.setBackgroundColor(Color.rgb(0, 0, 51));
+        lineChart.setBackgroundColor(Color.rgb(0x33, 0, 0x66));
 
         //折线图例 标签 设置
         Legend legend = lineChart.getLegend();
@@ -137,7 +137,7 @@ public class DynamicLineChartManager {
         lineDataSet.setCircleColor(color);
         lineDataSet.setHighLightColor(color);
         //设置曲线填充
-        lineDataSet.setDrawFilled(true);
+//        lineDataSet.setDrawFilled(true);
         lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
         lineDataSet.setValueTextSize(5f);
         lineDataSet.setValueTextColor(Color.WHITE);
@@ -184,7 +184,7 @@ public class DynamicLineChartManager {
      *
      * @param number
      */
-    public void addEntry(int number) {
+    public void addEntry(float number) {
         if(pause){
             return;
         }

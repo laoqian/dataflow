@@ -22,12 +22,14 @@ import android.widget.TextView;
 import com.example.a85838.myapplication.bluetooth.BlueToothUtils;
 import com.example.a85838.myapplication.bluetooth.DynamicLineChartManager;
 import com.example.a85838.myapplication.bluetooth.Filter;
+import com.example.a85838.myapplication.bluetooth.LimitQueue;
 import com.example.a85838.myapplication.bluetooth.MyBluetoothActivity;
 import com.github.mikephil.charting.charts.LineChart;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements OnSeekBarChangeListener  {
@@ -37,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
     private static final  String TAG ="MainActivity";
     private LineChart mChart;
     DynamicLineChartManager chartManager;
-
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -101,11 +102,10 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
                 super.handleMessage(msg);
                 switch (msg.what) {
                     case 0:
-                        List<Byte> list = (List<Byte>) msg.obj;
-                        for(int i=0;i<list.size();i++){
-//                            queue.offer(list.get(i));
+                        for(float volt:(float[])msg.obj){
+                            Log.e(TAG,"电压："+volt);
+                            chartManager.addEntry(volt);
                         }
-
                         break;
                     default:
                         break;
@@ -122,34 +122,9 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
 //        final DynamicLineChartManager dynamicLineChartManager = new DynamicLineChartManager(mChart,Arrays.asList("原始","滤波后"), Arrays.asList(Color.CYAN,Color.GREEN));
         final DynamicLineChartManager dynamicLineChartManager = new DynamicLineChartManager(mChart,"波形",Color.CYAN);
         chartManager = dynamicLineChartManager;
-        dynamicLineChartManager.setYAxis(100, 0, 5);
+        dynamicLineChartManager.setYAxis(4f, -4, 10);
 
-        //死循环添加数据
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Random random = new Random();
-                        int length = 300;
-                        byte[] bytes = new byte[length];
-                        for(int i=0;i<length;i++){
-                            bytes[i] = (byte)(random.nextInt(80));
-                        }
-
-//                        int val = Filter.doAvg(bytes,64);
-                        int val1 = Filter.doFilter(bytes,length);
-
-                        dynamicLineChartManager.addEntry(val1);
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
