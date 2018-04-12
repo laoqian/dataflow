@@ -8,6 +8,23 @@
     android:background="#eeeeee"
     tools:context=".MainActivity">
 
+    <Button
+        android:id="@+id/pause"
+        style="@android:style/Widget.Material.Button.Borderless"
+        android:layout_width="89dp"
+        android:layout_height="52dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="168dp"
+        android:layout_marginTop="8dp"
+        android:background="#48c9b0"
+        android:onClick="clickHandler"
+        android:text="@string/pause"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lineChart"
+        app:layout_constraintVertical_bias="0.0" />
+
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"
         android:layout_width="0dp"
@@ -20,7 +37,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/pause"
+        android:id="@+id/swtich"
         style="@android:style/Widget.Material.Button.Borderless"
         android:layout_width="89dp"
         android:layout_height="52dp"
@@ -30,12 +47,13 @@
         android:layout_marginTop="8dp"
         android:background="#48c9b0"
         android:onClick="clickHandler"
-        android:text="@string/pause"
+        android:text="方式1"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lineChart" />
+        app:layout_constraintHorizontal_bias="0.269"
+        app:layout_constraintStart_toEndOf="@+id/pause"
+        app:layout_constraintTop_toBottomOf="@+id/lineChart"
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

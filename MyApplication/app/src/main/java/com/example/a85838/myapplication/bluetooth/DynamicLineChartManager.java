@@ -35,8 +35,9 @@ public class DynamicLineChartManager {
     private static final  float FONT_SIZE = 2f;
     private boolean pause = false;
 
-    public void change(){
+    public boolean change(){
         this.pause = !this.pause;
+        return this.pause;
     }
 
     public boolean  getPause(){

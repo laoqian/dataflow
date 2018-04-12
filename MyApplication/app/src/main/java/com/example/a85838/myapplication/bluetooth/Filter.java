@@ -38,15 +38,15 @@ public class Filter{
     }
 
 
-    public static float[] doFilter(float[] filter_buf, int length) {
+    public static float doFilter(float[] filter_buf, int length) {
         int i,j=0;
         float[] buffer = new float[length-2];
-
+        float sum = 0;
         sort(filter_buf,length);
         for (i = 1; i < length - 1; i++) {
-            buffer[j++] = filter_buf[i];
+            sum += filter_buf[i];
         }
 
-        return buffer;
+        return sum/(length-2);
     }
 }
