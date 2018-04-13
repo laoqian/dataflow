@@ -65,17 +65,13 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
         switch (v.getId()) {
             case R.id.pause:
                 Button button = findViewById(R.id.pause);
-                boolean pause = chartManager.change();
-
-                button.setText(pause?"继续":"暂停");
-
+                button.setText(chartManager.change()?"继续":"暂停");
                 Log.e(TAG, button.getText().toString());
                 break;
-            case R.id.swtich:
-                BlueToothUtils.swtich();
-                Button swtich = findViewById(R.id.swtich);
-                boolean pastType = BlueToothUtils.swtich();
-                swtich.setText(pastType?"方式1":"方式2");
+            case R.id.change:
+                Button change = findViewById(R.id.change);
+                change.setText(BlueToothUtils.swtich()?"方式1":"方式2");
+                Log.e(TAG, change.getText().toString());
                 break;
             default:
                 Log.e(TAG, "不支持的操作"+v.getId());
@@ -120,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
 //        final DynamicLineChartManager dynamicLineChartManager = new DynamicLineChartManager(mChart,Arrays.asList("原始","滤波后"), Arrays.asList(Color.CYAN,Color.GREEN));
         final DynamicLineChartManager dynamicLineChartManager = new DynamicLineChartManager(mChart,"波形",Color.CYAN);
         chartManager = dynamicLineChartManager;
-        dynamicLineChartManager.setYAxis(5f, 0, 10);
+        dynamicLineChartManager.setYAxis(4f, 0, 4);
 
     }
 

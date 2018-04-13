@@ -22,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -39,10 +38,11 @@ public class MyBluetoothActivity extends AppCompatActivity {
     private final static int SEARCH_CODE = 0x123;
     private BluetoothAdapter mBluetoothAdapter ;
     private static final String TAG = "MyBluetoothActivity";
-
-    private List<BluetoothDevice> mBlueList = new ArrayList<>();
+    private static List<BluetoothDevice> mBlueList = new ArrayList<>();
     private ListView lisetView;
     private static  boolean enable;
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,20 +54,19 @@ public class MyBluetoothActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-
         lisetView           =  findViewById(R.id.list_view);
+        devListShow();
+
         lisetView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 BluetoothDevice device = mBlueList.get(i);
-                BlueToothUtils.connect(mBlueList.get(i));
-                MyAdapter adapter = new MyAdapter(MyBluetoothActivity.this, mBlueList);
-                lisetView.setAdapter(adapter);
-
+                BlueToothUtils.connect(device);
+                devListShow();
                 Toast.makeText(MyBluetoothActivity.this, device.getName(), Toast.LENGTH_LONG).show();
-
             }
         });
+
         Log.e(TAG, "onCreate: GPS是否可用：" + isGpsEnable(this));
     }
 
@@ -83,7 +82,10 @@ public class MyBluetoothActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
+    private void devListShow(){
+        MyAdapter adapter = new MyAdapter(MyBluetoothActivity.this, mBlueList);
+        lisetView.setAdapter(adapter);
+    }
     public void clickHandler(View v) {
 
         switch (v.getId()) {
@@ -95,8 +97,7 @@ public class MyBluetoothActivity extends AppCompatActivity {
                 BlueToothUtils.close();
                 break;
             case R.id.closeBluetooth:
-                BlueToothUtils.close();
-                mBluetoothAdapter.disable();
+                bluetoothClose();
                 break;
             default:
                 Log.e(TAG, "不支持的操作"+v.getId());
@@ -144,6 +145,11 @@ public class MyBluetoothActivity extends AppCompatActivity {
         return gps || network;
     }
 
+    private void bluetoothClose(){
+        enable = false;
+        BlueToothUtils.close();
+        mBluetoothAdapter.disable();
+    }
     /**
      * 判断蓝牙是否开启
      */
@@ -173,71 +179,57 @@ public class MyBluetoothActivity extends AppCompatActivity {
      * 注册异步搜索蓝牙设备的广播
      */
     private void startDiscovery() {
-        if(enable){
-            unregisterReceiver(receiver);
+        if(!enable){
+            // 找到设备的广播
+            IntentFilter filter        = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+            BroadcastReceiver receiver = getReceiver();
+            // 注册广播
+            registerReceiver(receiver, filter);
+            // 搜索完成的广播
+            IntentFilter filter1 = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+            // 注册广播
+            registerReceiver(receiver, filter1);
+
+            Log.e(TAG, "startDiscovery: 注册广播");
+            enable = true;
         }
 
-        // 找到设备的广播
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        // 注册广播
-        registerReceiver(receiver, filter);
-        // 搜索完成的广播
-        IntentFilter filter1 = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        // 注册广播
-        registerReceiver(receiver, filter1);
-
-        Log.e(TAG, "startDiscovery: 注册广播");
-        enable = true;
         startScanBluth();
     }
 
-    /**
-     * 广播接收器
-     */
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // 收到的广播类型
-            String action = intent.getAction();
-            // 发现设备的广播
+    private BroadcastReceiver getReceiver(){
 
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+        return  new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 
-                Log.e(TAG, "onReceive:搜索到设备" );
+                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    if (!mBlueList.contains(device)) {
+                        mBlueList.add(device);
+                    }
 
-                // 从intent中获取设备
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                // 没否配对
+                    devListShow();
+                    Log.e(TAG, "搜索到设备: " + (device.getName() + ":" + device.getAddress() + " ：" + "m" + "\n"));
+                    // 搜索完成
+                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
 
-                Log.e(TAG, "onReceive: " + (device.getName() + ":" + device.getAddress() + " ：" + "m" + "\n"));
-
-                if (!mBlueList.contains(device)) {
-                    mBlueList.add(device);
+                    // 关闭进度条
+                    progressDialog.dismiss();
+                    Log.e(TAG, "搜索完成");
+                }else {
+                    Log.e(TAG, "其他情况" );
                 }
-                Log.e(TAG,"附近设备：" + mBlueList.size() + "个\u3000\u3000本机蓝牙地址：" + getBluetoothAddress());
-                MyAdapter adapter = new MyAdapter(MyBluetoothActivity.this, mBlueList);
-                lisetView.setAdapter(adapter);
-
-                Log.e(TAG, "onReceive: " + mBlueList.size());
-                Log.e(TAG, "onReceive: " + (device.getName() + ":" + device.getAddress() + " ：" + "m" + "\n"));
-
-                // 搜索完成
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                // 关闭进度条
-                progressDialog.dismiss();
-                Log.e(TAG, "onReceive: 搜索完成");
-            }else {
-                Log.e(TAG, "onReceive:其他情况" );
             }
-        }
-    };
-
-    private ProgressDialog progressDialog;
+        };
+    }
 
     /**
      * 搜索蓝牙的方法
      */
     private void startScanBluth() {
+
         // 判断是否在搜索,如果在搜索，就取消搜索
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();

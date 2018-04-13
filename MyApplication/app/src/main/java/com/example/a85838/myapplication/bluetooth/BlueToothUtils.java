@@ -26,7 +26,10 @@ public class BlueToothUtils {
     private static BluetoothSocket socket;
     private static  Thread thread;
     private static Handler handler;
-    private static boolean pastType = true;
+    private static boolean pastType         = true;
+    private static float[] volts_buffer     = new float[50];
+    private static int buffer_pos           = 0;
+    private static final int BUFFER_SIZE    = 10;
 
     public static boolean swtich(){
         pastType = !pastType;
@@ -92,10 +95,16 @@ public class BlueToothUtils {
     private static void parser(byte[] buffer,int length){
         float[] volts  = pastType?pastParser(buffer,length):lastParser(buffer,length);
         if(volts!=null){
-            Message msg = new Message();
-            msg.what = 0;
-            msg.obj  = Filter.doFilter(volts,volts.length);
-            handler.sendMessage(msg);
+            volts_buffer[buffer_pos++] = Filter.doFilter(volts,volts.length);
+            if(buffer_pos>=BUFFER_SIZE){
+                float volt = Filter.doFilter(volts_buffer,buffer_pos);
+                Message msg;
+                msg = new Message();
+                msg.what = 0;
+                msg.obj = volt;
+                handler.sendMessage(msg);
+                buffer_pos = 0;
+            }
         }
     }
 
@@ -105,16 +114,12 @@ public class BlueToothUtils {
 
     public static void connect(BluetoothDevice d) {
         device = d;
-
         if(thread!=null){
             thread.isInterrupted();
         }
 
         thread = new Thread(new Runnable() {
             public void run() {
-
-                Log.e(TAG, "启动后台线程" + Thread.currentThread().getId());
-
                 try {
                     final String SPP_UUID = "00001101-0000-1000-8000-00805F9B34FB";
                     socket = device.createRfcommSocketToServiceRecord(UUID.fromString(SPP_UUID));
@@ -130,11 +135,10 @@ public class BlueToothUtils {
                         byte[] buffer = new byte[1024];
                         int lenth = inputStream.read(buffer);
                         if(lenth>0){
-                            parser(buffer,lenth);
+                           parser(buffer,lenth);
                         }
 
                         if (Thread.currentThread().isInterrupted()) {
-                            Log.e(TAG, "关闭后台线程" + Thread.currentThread().getId());
                             socket.close();
                             break;
                         }
@@ -151,7 +155,7 @@ public class BlueToothUtils {
     }
 
     public static void  close(){
-        device = null;
+        device    = null;
         if(thread!=null){
             thread.isInterrupted();
         }
