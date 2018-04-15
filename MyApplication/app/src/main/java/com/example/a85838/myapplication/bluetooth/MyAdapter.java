@@ -78,9 +78,9 @@ public class MyAdapter extends BaseAdapter {
         if (deviceState == 10) {
             viewHolder.deviceState.setText("未匹配");
         } else if (deviceState == 11) {
-            viewHolder.deviceState.setText("绑定中");
+            viewHolder.deviceState.setText("连接中");
         } else if (deviceState == 12) {
-            viewHolder.deviceState.setText("已绑定");
+            viewHolder.deviceState.setText("已匹配");
         }
         //返回远程设备支持的UUID。此方法从远程设备检索UUID不启动服务。 而是返回服务UUID的本地缓存。
         //如果需要刷新UUID，使用fetchUuidsWithSdp（）方法

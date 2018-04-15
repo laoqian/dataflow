@@ -29,7 +29,7 @@ public class BlueToothUtils {
     private static boolean pastType         = true;
     private static float[] volts_buffer     = new float[50];
     private static int buffer_pos           = 0;
-    private static final int BUFFER_SIZE    = 10;
+    private static final int BUFFER_SIZE    = 5;
 
     public static boolean swtich(){
         pastType = !pastType;
@@ -65,23 +65,23 @@ public class BlueToothUtils {
     }
 
     private static float[] lastParser(byte[] buffer,int length){
-        String key0,key1,key4,key5;
+        byte key0,key1,key4,key5;
         int key2,key3;
         int vlenth=0;
         float[] voltages = new float[200];
 
         for(int i=0;i<length-5;){
-            key0 = Integer.toHexString(buffer[i]&0xff);
-            key1 = Integer.toHexString(buffer[i+1]&0xff);
+            key0 = buffer[i];
+            key1 = buffer[i+1];
             key2 = buffer[i+2];
             key3 = buffer[i+3];
-            key4 = Integer.toHexString(buffer[i+4]&0xff);
-            key5 = Integer.toHexString(buffer[i+5]&0xff);
+            key4 = buffer[i+4];
+            key5 = buffer[i+5];
 
-            if("0x03".equals(key0) && "0xfc".equals(key1) && "0x03".equals(key5) && "0xfc".equals(key4)){
-                int value = (key3<<8)&0x0f00,value2 ;
+            if(key0==3 && key1==-4 && key4==-4 && key5==3 ){
+                int value = (key3<<8)&0xff00,value2 ;
                 value2 = key2&0x00ff;
-                value2 = value+value2;
+                value2 = value|value2;
                 voltages[vlenth++] = (((float)value2)/0x0fff)*(3.3f);
                 i=i+5;
             }else{
@@ -89,7 +89,7 @@ public class BlueToothUtils {
             }
         }
 
-        return  Arrays.copyOf(voltages,length);
+        return  Arrays.copyOf(voltages,vlenth);
     }
 
     private static void parser(byte[] buffer,int length){

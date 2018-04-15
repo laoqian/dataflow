@@ -86,14 +86,24 @@ public class MyBluetoothActivity extends AppCompatActivity {
         MyAdapter adapter = new MyAdapter(MyBluetoothActivity.this, mBlueList);
         lisetView.setAdapter(adapter);
     }
+
+    private void devListClear(){
+        mBlueList.clear();
+        MyAdapter adapter = new MyAdapter(MyBluetoothActivity.this, mBlueList);
+        lisetView.setAdapter(adapter);
+    }
+
     public void clickHandler(View v) {
 
         switch (v.getId()) {
             case R.id.search:
                 Log.e(TAG, "搜索蓝牙设备");
+                BlueToothUtils.close();
+                devListClear();
                 init();
                 break;
             case R.id.closeDev:
+                Toast.makeText(MyBluetoothActivity.this,"断开连接", Toast.LENGTH_LONG).show();
                 BlueToothUtils.close();
                 break;
             case R.id.closeBluetooth:
@@ -146,6 +156,7 @@ public class MyBluetoothActivity extends AppCompatActivity {
     }
 
     private void bluetoothClose(){
+        Toast.makeText(MyBluetoothActivity.this,"关闭蓝牙", Toast.LENGTH_LONG).show();
         enable = false;
         BlueToothUtils.close();
         mBluetoothAdapter.disable();
@@ -236,9 +247,10 @@ public class MyBluetoothActivity extends AppCompatActivity {
         }
         // 开始搜索
         mBluetoothAdapter.startDiscovery();
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-        }
+
+        progressDialog = new ProgressDialog(this);
+
+        Log.e(TAG, "显示对话框");
         progressDialog.setMessage("正在搜索，请稍后！");
         progressDialog.show();
     }
