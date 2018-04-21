@@ -7,18 +7,11 @@ import android.os.Message;
 import android.util.Log;
 
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class BlueToothUtils {
     private static BluetoothDevice device;

@@ -208,7 +208,7 @@ public class DynamicLineChartManager {
         lineData.notifyDataChanged();
         lineChart.notifyDataSetChanged();
         //设置在曲线图中显示的最大数量
-        lineChart.setVisibleXRangeMaximum(30);
+        lineChart.setVisibleXRangeMaximum(60);
 
         //移到某个位置
         lineChart.moveViewToX(lineData.getEntryCount() - 5);
